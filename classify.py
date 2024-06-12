@@ -72,8 +72,8 @@ def main():
         early_stop = keras.callbacks.EarlyStopping(monitor = 'val_loss', patience = 20, start_from_epoch = 100, restore_best_weights=True)
         
         model = keras.Sequential([keras.layers.Flatten(input_shape=(x_train.shape[1],)),
-                                             #keras.layers.Dense(512, activation="relu"),
-                                             #keras.layers.BatchNormalization(),
+                                             keras.layers.Dense(512, activation="relu"),
+                                             keras.layers.BatchNormalization(),
                                              #keras.layers.Dropout(.3),
 
                                              keras.layers.Dense(256, activation="relu"),
@@ -91,7 +91,7 @@ def main():
                                              keras.layers.Dense(32,  activation="relu"),
                                              keras.layers.BatchNormalization(),
                                              #keras.layers.Dropout(.3),
-                                             #keras.layers.Dense(16,  activation="relu"),
+            
 
                                              keras.layers.Dense(16,   activation="relu"),
                                              keras.layers.BatchNormalization(),
