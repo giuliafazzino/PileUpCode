@@ -78,7 +78,7 @@ def main():
     df_bkg_new = df_bkg_new[(df_bkg_new['avgMu'] > 20)] 
 
     # Only keep the columns of interest
-    columns = ['label','cluster_nCells_tot', 'clusterE','cluster_time', 
+    columns = ['cluster_nCells_tot', 'clusterE','cluster_time', 
                'cluster_EM_PROBABILITY', 'cluster_CENTER_MAG', 'cluster_FIRST_ENG_DENS', 'cluster_SECOND_R', 
                'cluster_CENTER_LAMBDA', 'cluster_LATERAL', 'cluster_ENG_FRAC_EM', 
                'cluster_ISOLATION', 'cluster_AVG_LAR_Q', 'cluster_AVG_TILE_Q', 
@@ -95,10 +95,10 @@ def main():
     apply_cuts(df_bkg_new)
     apply_cuts(df_sig_new)
 
-    ######################
+    ####################
     #  Plot features  #
-    ######################
-    
+    ###################
+
     print('Plotting features ... \n')
     with PdfPages(fig_path + '/features_comparison.pdf') as pdf:
 
@@ -107,17 +107,17 @@ def main():
             fig, ax = plt.subplots(figsize=[10., 5.])
             bins = 30
 
-            _, bin_edges, _ = ax.hist(df_bkg_old[key].to_numpy(), bins=bins, histtype="step", 
-                                      color = 'blue', density=True, label='Bkg, old data')
+            _, bin_edges, _ = ax.hist(df_bkg_old[key].to_numpy(), bins=bins, histtype="stepfilled", 
+                                      color = 'blue', alpha=.4, density=True, label='Bkg, old data')
                 
-            _               = ax.hist(df_bkg_new[key].to_numpy(), bins=bin_edges, histtype="step", 
-                                      color = 'green', density=True, label='Bkg, new data')
+            _               = ax.hist(df_bkg_new[key].to_numpy(), bins=bin_edges, histtype="stepfilled", 
+                                      color = 'green', alpha = .4, density=True, label='Bkg, new data')
 
-            _, bin_edges, _ = ax.hist(df_sig_old[key].to_numpy(), bins=bins, histtype="step", 
-                                      color = 'blue', density=True, label='Sig, old data')
+            _                = ax.hist(df_sig_old[key].to_numpy(), bins=bin_edges, histtype="stepfilled", 
+                                      color = 'red',alpha = .4, density=True, label='Sig, old data')
                 
-            _               = ax.hist(df_sig_new[key].to_numpy(), bins=bin_edges, histtype="step", 
-                                      color = 'green', density=True, label='Sig, new data')
+            _               = ax.hist(df_sig_new[key].to_numpy(), bins=bin_edges, histtype="stepfilled", 
+                                      color = 'orange', alpha=.4, density=True, label='Sig, new data')
 
             # Features to put in log scale    
             if key in ['clusterE', 'cluster_CENTER_LAMBDA', 'cluster_FIRST_ENG_DENS', 'cluster_SECOND_R',
@@ -127,7 +127,7 @@ def main():
 
             ax.set_xlabel(key)
             ax.set_ylabel('Frequency')
-            ax.legend()
+            ax.legend(ncol = 2)
 
             # Save figure
             pdf.savefig(fig)
