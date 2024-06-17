@@ -54,7 +54,7 @@ def roc(labels_train, preds_train, labels_test, preds_test, plot_path = 'out/plo
    # Find optimal threshold from ROC
    best_index = np.argmax(tpr_test - fpr_test) 
    plt.plot(fpr_test[best_index], tpr_test[best_index], 'go', markersize = 10, markerfacecolor = 'white',
-            label = f'Optimal working point : {thresholds_test[best_index]:.2f}')
+            label = f'Best threshold = {thresholds_test[best_index]:.2f}')
 
 
    plt.legend(loc='lower right')
