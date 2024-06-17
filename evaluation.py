@@ -50,23 +50,26 @@ def roc(labels_train, preds_train, labels_test, preds_test, plot_path = 'out/plo
    plt.plot(fpr_train, tpr_train, 'b', label='AUC (train) = %0.4f'% roc_auc_train)
    plt.plot(fpr_test, tpr_test, 'g', label='AUC (test) = %0.4f'% roc_auc_test)
 
+  
+   # Find optimal threshold from ROC
+   best_index = np.argmax(tpr_test - fpr_test) 
+   plt.plot(fpr_test[best_index], tpr_test[best_index], 'go', markersize = 10, markerfacecolor = 'white',
+            label = f'Optimal working point : {thresholds_test[best_index]:.2f}')
+
+
    plt.legend(loc='lower right')
    plt.plot([0,1],[0,1],'r--')
    plt.xlim([0,1])
    plt.ylim([0,1])
    plt.ylabel('True Positive Rate')
    plt.xlabel('False Positive Rate')
-  
-   # Find optimal threshold from ROC
-   #best_index = np.argmax(tpr - fpr) 
-   #plt.plot(fpr[best_index], tpr[best_index], 'bo', markersize = 10, markerfacecolor = 'white')
 
-   #print(f'Optimal threshold from ROC = {thresholds[best_index]:.3f}')
+   print(f'Optimal threshold from ROC = {thresholds_test[best_index]:.2f}')
    plt.savefig(plot_path + '/ROC.pdf')
    plt.close()
    print('Saving output in ' + plot_path + '/ROC.pdf \n')
 
-   #return thresholds[best_index]
+   #return thresholds_test[best_index]
    return
 
 def pr(labels_train, preds_train, labels_test, preds_test, plot_path = 'out/plots'):

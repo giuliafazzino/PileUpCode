@@ -1,5 +1,5 @@
 """
-Read the .root files and create dataframes fpr training and testing
+Read the .root files and create dataframes for training and testing
 """
 
 import uproot as ur
@@ -165,10 +165,10 @@ def apply_scale(df, field_name, mode, pre_derived_scale = None):
 
 def main():
     # Import files
-    file_bkg = ur.open('/eos/user/g/gfazzino/pileupdata/fromChris/moreStats_mltree_mc20e_withPileup.root') 
-    file_sig = ur.open('/eos/user/g/gfazzino/pileupdata/fromChris/moreStats_mltree_mc20e_noPileup.root') 
-    #file_bkg = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc20e/mc20e_withPU.root') 
-    #file_sig = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc20e/mc20e_noPU.root') 
+    #file_bkg = ur.open('/eos/user/g/gfazzino/pileupdata/fromChris/moreStats_mltree_mc20e_withPileup.root') 
+    #file_sig = ur.open('/eos/user/g/gfazzino/pileupdata/fromChris/moreStats_mltree_mc20e_noPileup.root') 
+    file_bkg = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc20e/mc20e_withPU.root') 
+    file_sig = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc20e/mc20e_noPU.root') 
     print('Found files, reading datasets... \n')
 
     # Output paths
