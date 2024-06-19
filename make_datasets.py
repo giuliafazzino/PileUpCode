@@ -167,8 +167,8 @@ def main():
     # Import files
     #file_bkg = ur.open('/eos/user/g/gfazzino/pileupdata/fromChris/moreStats_mltree_mc20e_withPileup.root') 
     #file_sig = ur.open('/eos/user/g/gfazzino/pileupdata/fromChris/moreStats_mltree_mc20e_noPileup.root') 
-    file_bkg = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc23d/mc23d_withPU.root') 
-    file_sig = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc23d/mc23d_noPU.root') 
+    file_bkg = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc20e/mc20e_withPU.root') 
+    file_sig = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc20e/mc20e_noPU.root') 
     print('Found files, reading datasets... \n')
 
     # Output paths
@@ -234,7 +234,9 @@ def main():
                'cluster_EM_PROBABILITY', 'cluster_CENTER_MAG', 'cluster_FIRST_ENG_DENS', 'cluster_SECOND_R', 
                'cluster_CENTER_LAMBDA', 'cluster_LATERAL', 'cluster_ENG_FRAC_EM', 
                'cluster_ISOLATION', 'cluster_AVG_LAR_Q', 'cluster_AVG_TILE_Q', 
-               'cluster_SECOND_TIME']       #, 'cluster_fracE'
+               'cluster_SECOND_TIME', 
+                # these ones are not used for PU suppression
+               'clusterEta', 'cluster_SIGNIFICANCE', 'cluster_PTD', 'nPrimVtx']      
     
     df = df[columns]
     df_bkg = df_bkg[columns]
@@ -321,14 +323,14 @@ def main():
     field_names = ['clusterE', 'cluster_CENTER_LAMBDA', 'cluster_FIRST_ENG_DENS', 'cluster_SECOND_R',
                    'cluster_AVG_LAR_Q',
                    'cluster_AVG_TILE_Q', 'cluster_SECOND_TIME', 
-                   'cluster_nCells_tot'] #'cluster_fracE', 
+                   'cluster_nCells_tot', 'cluster_SIGNIFICANCE'] #'cluster_fracE', 
     for field_name in field_names:
         df_train, scales[field_name] = apply_scale(df_train, field_name, 'lognormalise')
         df_test = apply_scale(df_test, field_name, 'lognormalise', scales[field_name])[0]
 
     # Just normalizing
     field_names = ['cluster_EM_PROBABILITY', 'cluster_CENTER_MAG', 'cluster_ENG_FRAC_EM',
-                   'cluster_LATERAL', 'cluster_ISOLATION']
+                   'cluster_LATERAL', 'cluster_ISOLATION', 'clusterEta', 'nPrimVtx', 'cluster_PTD']
     for field_name in field_names:
         df_train, scales[field_name] = apply_scale(df_train, field_name, 'normalise')
         df_test = apply_scale(df_test, field_name, 'normalise', scales[field_name])[0]
@@ -348,21 +350,21 @@ def main():
     save = True
 
     if save:
-        arr_train = df_train.to_numpy()
-        arr_test = df_test.to_numpy()
+        #arr_train = df_train.to_numpy()
+        #arr_test = df_test.to_numpy()
 
-        print('Training array shape: ', arr_train.shape)
-        print('Testing array shape: ', arr_test.shape, '\n')
+        #print('Training array shape: ', arr_train.shape)
+        #print('Testing array shape: ', arr_test.shape, '\n')
 
-        # Save scales we used
+        # Save scales
         with open(file_scales, "w") as f:
             f.write(str(scales))
 
         # Save data    
         print('Saving training data ... \n')
-        np.save('data/all_info_df_train.npy', arr_train)
+        df_train.to_csv('data/df_train.csv', index = False)
         print('Saving test data ...')
-        np.save("data/all_info_df_test.npy", arr_test)
+        df_test.to_csv('data/df_test.csv', index = False)
     
 
 

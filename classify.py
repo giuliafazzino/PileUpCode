@@ -42,19 +42,24 @@ def main():
     ###############
     #  Read data  #
     ###############
+    classification_features = ['cluster_nCells_tot', 'clusterE','cluster_time', 
+               'cluster_EM_PROBABILITY', 'cluster_CENTER_MAG', 'cluster_FIRST_ENG_DENS', 'cluster_SECOND_R', 
+               'cluster_CENTER_LAMBDA', 'cluster_LATERAL', 'cluster_ENG_FRAC_EM', 
+               'cluster_ISOLATION', 'cluster_AVG_LAR_Q', 'cluster_AVG_TILE_Q', 
+               'cluster_SECOND_TIME']
 
     # Train (label is in the first column)
     print('-'*100)
-    data_train = np.load('data/all_info_df_train.npy')
-    x_train = data_train[:,1::]
-    y_train = data_train[:, 0]
+    data_train = pd.read_csv('data/df_train.csv')
+    x_train = data_train[classification_features].to_numpy()
+    y_train = data_train['label'].to_numpy()
     print(f'Training dataset size {y_train.shape}')
     print(f'Signal events {np.sum(y_train)}')
 
     # Test (label is in the first column)
-    data_test = np.load('data/all_info_df_test.npy')
-    x_test= data_test[:,1::]
-    y_test = data_test[:, 0]
+    data_test = pd.read_csv('data/df_test.csv')
+    x_test = data_test[classification_features].to_numpy()
+    y_test = data_test['label'].to_numpy()
     print(f'Test dataset size {y_test.shape}')
     print(f'Signal events {np.sum(y_test)}')
     print('-'*100, '\n')
@@ -67,7 +72,7 @@ def main():
         ###############
         #  Build DNN  #
         ###############
-        nepochs = 400
+        nepochs = 4
         
         early_stop = keras.callbacks.EarlyStopping(monitor = 'val_loss', patience = 30, start_from_epoch = 100, restore_best_weights=False)
         
@@ -152,9 +157,8 @@ def main():
         print('Saving output ...')
 
         model.save(out_path+"/model.h5")
-        np.save(out_path + '/trueClass_train.npy', y_train)
-        np.save(out_path + '/predictions_train.npy', model.predict(x_train).flatten())
-        np.save(out_path + '/x_train.npy', x_train)  
+        data_train = data_train.assign(pred = model.predict(data_train[classification_features].to_numpy()).flatten())
+        data_train.to_csv('data/df_train.csv', index = False)
 
     ##############
     #    Test    #
@@ -166,16 +170,10 @@ def main():
         if model == None:
             return
             
-        # Calculate predictions
-        print('Calculating predictions ...')
-        y_pred = model.predict(x_test).flatten()
-
-
         # Save outputs
-        print('Saving output ...')
-        np.save(out_path + '/trueClass_test.npy', y_test)
-        np.save(out_path + '/predictions_test.npy', y_pred)
-        np.save(out_path + '/x_test.npy', x_test)  
+        print('Calculating predisctions and saving output ...')
+        data_test = data_test.assign(pred = model.predict(data_test[classification_features].to_numpy()).flatten())
+        data_test.to_csv('data/df_test.csv', index = False)
                 
     return
 

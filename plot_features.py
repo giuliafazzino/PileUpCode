@@ -107,17 +107,17 @@ def main():
             fig, ax = plt.subplots(figsize=[10., 5.])
             bins = 30
 
-            _, bin_edges, _ = ax.hist(df_bkg_old[key].to_numpy(), bins=bins, histtype="stepfilled", 
-                                      color = 'blue', alpha=.4, density=True, label='Bkg, MC20e')
+            _, bin_edges, _ = ax.hist(df_bkg_old[key].to_numpy(), bins=bins, histtype="step", 
+                                      color = 'blue', density=True, label='Bkg, MC20e')
                 
-            _               = ax.hist(df_bkg_new[key].to_numpy(), bins=bin_edges, histtype="stepfilled", 
-                                      color = 'green', alpha = .4, density=True, label='Bkg, MC23d')
+            _               = ax.hist(df_bkg_new[key].to_numpy(), bins=bin_edges, histtype="step", 
+                                      color = 'green', density=True, label='Bkg, MC23d')
 
-            _                = ax.hist(df_sig_old[key].to_numpy(), bins=bin_edges, histtype="stepfilled", 
-                                      color = 'red',alpha = .4, density=True, label='Sig, MC20e')
+            _                = ax.hist(df_sig_old[key].to_numpy(), bins=bin_edges, histtype="step", 
+                                      color = 'red',density=True, label='Sig, MC20e')
                 
-            _               = ax.hist(df_sig_new[key].to_numpy(), bins=bin_edges, histtype="stepfilled", 
-                                      color = 'orange', alpha=.4, density=True, label='Sig, MC23d')
+            _               = ax.hist(df_sig_new[key].to_numpy(), bins=bin_edges, histtype="step", 
+                                      color = 'orange', density=True, label='Sig, MC23d')
 
             # Features to put in log scale    
             if key in ['clusterE', 'cluster_CENTER_LAMBDA', 'cluster_FIRST_ENG_DENS', 'cluster_SECOND_R',
