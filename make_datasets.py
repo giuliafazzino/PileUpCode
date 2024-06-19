@@ -167,8 +167,8 @@ def main():
     # Import files
     #file_bkg = ur.open('/eos/user/g/gfazzino/pileupdata/fromChris/moreStats_mltree_mc20e_withPileup.root') 
     #file_sig = ur.open('/eos/user/g/gfazzino/pileupdata/fromChris/moreStats_mltree_mc20e_noPileup.root') 
-    file_bkg = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc20e/mc20e_withPU.root') 
-    file_sig = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc20e/mc20e_noPU.root') 
+    file_bkg = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc23d/mc23d_withPU.root') 
+    file_sig = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc23d/mc23d_noPU.root') 
     print('Found files, reading datasets... \n')
 
     # Output paths
