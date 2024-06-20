@@ -163,6 +163,12 @@ def apply_scale(df, field_name, mode, pre_derived_scale = None):
     return df, scale
 
 
+def calculate_response(df):
+    resp = np.array(df['clusterE'].values )/np.array( df['cluster_ENG_CALIB_TOT'].values)
+    df["r_e_calculated"] = resp
+    df = df[df["r_e_calculated"]>0.1]
+    return df
+
 def main():
     # Import files
     #file_bkg = ur.open('/eos/user/g/gfazzino/pileupdata/fromChris/moreStats_mltree_mc20e_withPileup.root') 
@@ -229,6 +235,9 @@ def main():
     # Merge
     df = pd.concat([df_bkg, df_sig], ignore_index = True)
 
+    # Calculate response 
+    df = calculate_response(df)
+
     # Only keep the columns we want
     columns = ['label','cluster_nCells_tot', 'clusterE','cluster_time', 
                'cluster_EM_PROBABILITY', 'cluster_CENTER_MAG', 'cluster_FIRST_ENG_DENS', 'cluster_SECOND_R', 
@@ -236,7 +245,8 @@ def main():
                'cluster_ISOLATION', 'cluster_AVG_LAR_Q', 'cluster_AVG_TILE_Q', 
                'cluster_SECOND_TIME', 
                 # these ones are not used for PU suppression
-               'clusterEta', 'cluster_SIGNIFICANCE', 'cluster_PTD', 'nPrimVtx']      
+               'clusterEta', 'cluster_SIGNIFICANCE', 'cluster_PTD', 'nPrimVtx', 
+               'cluster_ENG_CALIB_TOT', 'r_e_calculated']      
     
     df = df[columns]
     df_bkg = df_bkg[columns]
