@@ -110,7 +110,7 @@ def main():
     print('\t y shape: ', y.shape)
 
     # Plot importances and save
-    plot_feature_importance(X, y, model, feature_names, 2, True, dir_path)
+    plot_feature_importance(X, y, model, feature_names, 10, True, dir_path)
 
 if __name__ == '__main__':
     main()
