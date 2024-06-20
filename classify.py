@@ -72,9 +72,9 @@ def main():
         ###############
         #  Build DNN  #
         ###############
-        nepochs = 4
+        nepochs = 400
         
-        early_stop = keras.callbacks.EarlyStopping(monitor = 'val_loss', patience = 30, start_from_epoch = 100, restore_best_weights=False)
+        early_stop = keras.callbacks.EarlyStopping(monitor = 'val_loss', patience = 20, start_from_epoch = 100, restore_best_weights=False)
         
         model = keras.Sequential([keras.layers.Flatten(input_shape=(x_train.shape[1],)),
                                              keras.layers.Dense(512, activation="relu"),
@@ -105,7 +105,7 @@ def main():
 
                                              keras.layers.Dense(1,   activation="sigmoid")])
 
-        model.compile(optimizer=keras.optimizers.Adam(learning_rate = 0.001), loss='binary_crossentropy', 
+        model.compile(optimizer=keras.optimizers.Adam(learning_rate = 0.01), loss='binary_crossentropy', 
                       metrics=[keras.metrics.AUC()])
         
         # Reweighting

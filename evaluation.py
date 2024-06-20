@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import metrics
 from sklearn.utils import class_weight
+import pandas as pd
 
 
 params = {
@@ -119,13 +120,14 @@ def main():
 
 
     # Read files
-    y_true_train = np.load(dir_path + '/trueClass_train.npy')
-    probs_train = np.load(dir_path + '/predictions_train.npy')
-    x_train = np.load(dir_path + '/x_train.npy')
+    data_train = pd.read_csv('data/df_train.csv')
+    data_test = pd.read_csv('data/df_test.csv')
 
-    y_true_test = np.load(dir_path + '/trueClass_test.npy')
-    probs_test = np.load(dir_path + '/predictions_test.npy')
-    x_test = np.load(dir_path + '/x_test.npy')
+    y_true_train = data_train['label'].to_numpy()
+    probs_train = data_train['pred'].to_numpy()
+
+    y_true_test = data_test['label'].to_numpy()
+    probs_test = data_test['pred'].to_numpy()
 
     # Plot output probabilities
     print('Generating plot for probabilities ...')
@@ -143,21 +145,24 @@ def main():
     #####################################################
     #  Clusters outside collision time window (12.5 s)  #
     #####################################################
+
+    time_train = data_train['cluster_time'].to_numpy()
+    time_test = data_test['cluster_time'].to_numpy()
     
     # Masks 
-    train_oot = np.abs(x_train[:,2]) >= 12.5**(1./3.)
-    test_oot  = np.abs(x_test[:,2])  >= 12.5**(1./3.)
+    train_oot = np.abs(time_train) >= 12.5**(1./3.)
+    test_oot  = np.abs(time_test)  >= 12.5**(1./3.)
 
     # Plot timing distribution
     bins = np.arange(-72.5, 50.5, 5)
 
     plt.figure(figsize = [12,6])
-    plt.hist((x_train[:,2])**3, histtype = 'step', label = 'Train', color = 'darkred', bins = bins, fill = False, log = True, linewidth = 3)
-    plt.hist((x_test[:,2])**3, histtype = 'step', label = 'Test', color = 'darkblue', bins = bins, fill = False, log = True, linewidth = 3)
+    plt.hist((time_train)**3, histtype = 'step', label = 'Train', color = 'darkred', bins = bins, fill = False, log = True, linewidth = 3)
+    plt.hist((time_test)**3, histtype = 'step', label = 'Test', color = 'darkblue', bins = bins, fill = False, log = True, linewidth = 3)
 
-    plt.hist((x_train[:,2][train_oot])**3, histtype = 'stepfilled', label = 'Train (out of time)', color = 'sandybrown', 
+    plt.hist((time_train[train_oot])**3, histtype = 'stepfilled', label = 'Train (out of time)', color = 'sandybrown', 
              alpha = .7, bins = bins, log = True)
-    plt.hist((x_test[:,2][test_oot])**3, histtype = 'stepfilled', label = 'Test (out of time)', color = 'lightskyblue', 
+    plt.hist((time_test[test_oot])**3, histtype = 'stepfilled', label = 'Test (out of time)', color = 'lightskyblue', 
              alpha = .7, bins = bins, log = True)
     
     plt.xlabel('Time (ns)')
@@ -170,13 +175,6 @@ def main():
     plot_proba(y_true_train[train_oot], probs_train[train_oot], y_true_test[test_oot], probs_test[test_oot], 
                True, plot_path + '/probabilities_norm_oot.pdf')
 
-
-    # Predict classes
-    #y_pred = probs > threshold
-
-    # Plot confusion matrix
-    #print('Generatig confusion matrix ... ')
-    #plot_confmat(y_true, y_pred, threshold, plot_path)
 
     return
 

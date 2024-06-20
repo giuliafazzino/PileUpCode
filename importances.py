@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 from sklearn.metrics import roc_auc_score
 from pathlib import Path
+import pandas as pd
 
 def get_feature_importance(test_X, test_y, model, n, recreate=False, dir_path='out'):
     """
@@ -91,24 +92,25 @@ def plot_feature_importance(X, y, model, feature_names, iteration=10, recreate=F
 
 def main():
     dir_path = 'out'
-
-    # Load model and data
-    model = tf.keras.models.load_model(dir_path+"/model.h5", compile=False)
-    X = np.load(dir_path + '/x_test.npy')
-    y = np.load(dir_path + '/trueClass_test.npy')
-
     feature_names = ['cluster_nCells_tot', 'clusterE', 'cluster_time', 
                'cluster_EM_PROBABILITY', 'cluster_CENTER_MAG', 'cluster_FIRST_ENG_DENS', 'cluster_SECOND_R', 
                'cluster_CENTER_LAMBDA', 'cluster_LATERAL', 'cluster_ENG_FRAC_EM', 
                'cluster_ISOLATION', 'cluster_AVG_LAR_Q', 'cluster_AVG_TILE_Q', 
-               'cluster_SECOND_TIME']      
+               'cluster_SECOND_TIME']     
+
+    # Load model and data
+    model = tf.keras.models.load_model(dir_path+"/model.h5", compile=False)
+    data_test = pd.read_csv('data/df_test.csv')
+
+    X = data_test[feature_names].to_numpy()
+    y = data_test['label'].to_numpy()
 
     print('Checking data sizes...')
     print('\t X shape: ', X.shape)
     print('\t y shape: ', y.shape)
 
     # Plot importances and save
-    plot_feature_importance(X, y, model, feature_names, 10, True, dir_path)
+    plot_feature_importance(X, y, model, feature_names, 2, True, dir_path)
 
 if __name__ == '__main__':
     main()
