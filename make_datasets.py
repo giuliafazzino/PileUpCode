@@ -19,10 +19,12 @@ plt.rcParams.update(params)
 
 def apply_cuts(df):
     """ Apply some cuts on the variables based on their physical meaning"""
-    df = df[df["clusterE"]>0.]
+    df = df.loc[df["clusterE" ] > 0.]
     df = df[df["cluster_CENTER_LAMBDA"]>0.]
     df = df[df["cluster_FIRST_ENG_DENS"]>0.]
     df = df[df["cluster_SECOND_TIME"]>0.]
+    df = df.loc[df['cluster_ENG_CALIB_TOT'] > 0.]
+    return df
 
 
 def plot_features(df, output_path):
@@ -33,41 +35,42 @@ def plot_features(df, output_path):
         for idx, key in enumerate(df):
             print(f'Accessing variable with name = {key} ({idx+1} / {df.shape[1]})')
             data = df[key].to_numpy()
+            if key != 'label':
             # Make plots 
-            fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=[5.5*3, 5.])
+                fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=[5.5*3, 5.])
 
             # Linear scale
-            bins = 30
-            _, bin_edges, _ = ax1.hist(data, bins=bins, histtype="step", density=False, label="linear")
-            ax1.set_xlabel(key)
-            ax1.set_ylabel("Frequency")
+                bins = 30
+                _, bin_edges, _ = ax1.hist(data, bins=bins, histtype="step", density=False, label="linear")
+                ax1.set_xlabel(key)
+                ax1.set_ylabel("Frequency")
 
             # Log scale for y-axis
-            if data.min() <= 0:
-                data_upshifted = data + np.abs(data.min()) + 1e-30
-                label = "log (upshifted)"
-            else:
-                data_upshifted = data
-                label = "log"
+                if data.min() <= 0:
+                    data_upshifted = data + np.abs(data.min()) + 1e-30
+                    label = "log (upshifted)"
+                else:
+                    data_upshifted = data
+                    label = "log"
 
-            ax2.hist(data_upshifted, bins=bins, histtype="step", density=False, label=label)
-            ax2.set_yscale("log")
-            ax2.set_xlabel(key)
-            ax2.legend(frameon=False, loc="upper right")
-            ax2.set_ylabel("Frequency")
+                ax2.hist(data_upshifted, bins=bins, histtype="step", density=False, label=label)
+                ax2.set_yscale("log")
+                ax2.set_xlabel(key)
+                ax2.legend(frameon=False, loc="upper right")
+                ax2.set_ylabel("Frequency")
 
-            # Log scale for both axes
-            bins_log = np.logspace(np.log10(data_upshifted.min()), np.log10(data_upshifted.max()), len(bin_edges)-1)
-            ax3.hist(data_upshifted, bins=bins_log, histtype="step", density=False, label=label)
-            ax3.set_yscale("log")
-            ax3.set_xscale("log")
-            ax3.set_xlabel(key)
-            ax3.legend(frameon=False, loc="upper right")
-            ax3.set_ylabel("Frequency")
-            fig.tight_layout()
+                # Log scale for both axes
+                bins_log = np.logspace(np.log10(data_upshifted.min()), np.log10(data_upshifted.max()), len(bin_edges)-1)
+                ax3.hist(data_upshifted, bins=bins_log, histtype="step", density=False, label=label)
+                ax3.set_yscale("log")
+                ax3.set_xscale("log")
+                ax3.set_xlabel(key)
+                ax3.legend(frameon=False, loc="upper right")
+                ax3.set_ylabel("Frequency")
+                fig.tight_layout()
 
-            pdf.savefig(fig)
-            plt.close(fig)
+                pdf.savefig(fig)
+                plt.close(fig)
 
     print(f"Saving all figures into {output_path} \n")
 
@@ -95,7 +98,7 @@ def plot_features_classes(dataframes, labels, output_path):
                 if key in ['clusterE', 'cluster_CENTER_LAMBDA', 'cluster_FIRST_ENG_DENS', 'cluster_SECOND_R',
                    'cluster_AVG_LAR_Q',
                    'cluster_AVG_TILE_Q', 'cluster_SECOND_TIME',  
-                    'cluster_nCells_tot']: #'cluster_fracE',
+                    'cluster_nCells_tot', 'r_e_calculated']: #'cluster_fracE',
                     ax.set_yscale('log')
 
                 ax.set_xlabel(key)
@@ -162,12 +165,12 @@ def apply_scale(df, field_name, mode, pre_derived_scale = None):
     df[field_name] = x
     return df, scale
 
-
 def calculate_response(df):
-    resp = np.array(df['clusterE'].values )/np.array( df['cluster_ENG_CALIB_TOT'].values)
-    df["r_e_calculated"] = resp
-    df = df[df["r_e_calculated"]>0.1]
+    resp = np.array( df.clusterE.values ) /  np.array( df.cluster_ENG_CALIB_TOT.values )
+    df = df.assign(r_e_calculated = resp)
+    #df = df[df['r_e_calculated']>0.1]
     return df
+
 
 def main():
     # Import files
@@ -235,8 +238,27 @@ def main():
     # Merge
     df = pd.concat([df_bkg, df_sig], ignore_index = True)
 
+
+    # Apply cuts
+    df = apply_cuts(df)
+    df_bkg = apply_cuts(df_bkg)
+    df_sig = apply_cuts(df_sig)
+
+    #pd.set_option('use_inf_as_na',True)
+
+    df.dropna(inplace=True)
+
     # Calculate response 
     df = calculate_response(df)
+    df_bkg = calculate_response(df_bkg)
+    df_sig = calculate_response(df_sig)
+
+
+    # Remove problematic values
+    df = df.loc[df['r_e_calculated'] < 1e10]
+    df_bkg = df_bkg.loc[df_bkg['r_e_calculated'] < 1e10]
+    df_sig = df_sig.loc[df_sig['r_e_calculated'] < 1e10]
+    
 
     # Only keep the columns we want
     columns = ['label','cluster_nCells_tot', 'clusterE','cluster_time', 
@@ -255,8 +277,6 @@ def main():
     # Shuffle the rows
     df = df.sample(frac=1).reset_index(drop=True)
 
-    # Apply cuts
-    apply_cuts(df)
 
     bkg = df['label'] == 0
     print(f'Total number of clusters = {df.shape[0]}')

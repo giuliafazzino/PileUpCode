@@ -31,10 +31,12 @@ def main():
     ################ 
 
     # Import files
-    file_bkg_old = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc20e/mc20e_withPU.root') 
-    file_sig_old = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc20e/mc20e_noPU.root') 
-    file_bkg_new = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc23d/mc23d_withPU.root') 
-    file_sig_new = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc23d/mc23d_noPU.root')
+    file_bkg_old = ur.open('/eos/user/g/gfazzino/pileupdata/fromChris/moreStats_mltree_mc20e_withPileup.root') 
+    file_sig_old = ur.open('/eos/user/g/gfazzino/pileupdata/fromChris/moreStats_mltree_mc20e_noPileup.root') 
+    file_bkg_new = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc20e/mc20e_withPU.root') 
+    file_sig_new = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc20e/mc20e_noPU.root') 
+    #file_bkg_new = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc23d/mc23d_withPU.root') 
+    #file_sig_new = ur.open('/eos/user/g/gfazzino/pileupdata/SamplesForGiulia/mc23d/mc23d_noPU.root')
     print('Found files, reading datasets... \n')
 
     # Output paths
@@ -104,30 +106,37 @@ def main():
 
         # Loop over field names
         for key in df_bkg_old:
-            fig, ax = plt.subplots(figsize=[10., 5.])
+            fig, ax = plt.subplots(1,2, figsize=[15., 5.])
             bins = 30
+            ax1 = ax[0]
+            ax2 = ax[1]
+            _ , bin_edges, _ = ax1.hist(df_bkg_old[key].to_numpy(), bins=bins, histtype="step", 
+                                      color = 'blue', density=True, label='Bkg, old data')
 
-            _, bin_edges, _ = ax.hist(df_bkg_old[key].to_numpy(), bins=bins, histtype="step", 
-                                      color = 'blue', density=True, label='Bkg, MC20e')
-                
-            _               = ax.hist(df_bkg_new[key].to_numpy(), bins=bin_edges, histtype="step", 
-                                      color = 'green', density=True, label='Bkg, MC23d')
+            _               = ax1.hist(df_bkg_new[key].to_numpy(), bins=bin_edges, histtype="step", 
+                                      color = 'green', density=True, label='Bkg, new data')
 
-            _                = ax.hist(df_sig_old[key].to_numpy(), bins=bin_edges, histtype="step", 
-                                      color = 'red',density=True, label='Sig, MC20e')
+            _                = ax2.hist(df_sig_old[key].to_numpy(), bins=bin_edges, histtype="step", 
+                                      color = 'red',density=True, label='Sig, old data')
                 
-            _               = ax.hist(df_sig_new[key].to_numpy(), bins=bin_edges, histtype="step", 
-                                      color = 'orange', density=True, label='Sig, MC23d')
+            _               = ax2.hist(df_sig_new[key].to_numpy(), bins=bin_edges, histtype="step", 
+                                      color = 'orange', density=True, label='Sig, new data')
 
             # Features to put in log scale    
             if key in ['clusterE', 'cluster_CENTER_LAMBDA', 'cluster_FIRST_ENG_DENS', 'cluster_SECOND_R',
                 'cluster_AVG_LAR_Q', 'cluster_AVG_TILE_Q', 'cluster_SECOND_TIME',  
                 'cluster_nCells_tot']: 
-                ax.set_yscale('log')
+                ax1.set_yscale('log')
+                ax2.set_yscale('log')
 
-            ax.set_xlabel(key)
-            ax.set_ylabel('Frequency')
-            ax.legend(ncol = 2)
+            ax1.set_xlabel(key)
+            ax2.set_xlabel(key)
+            ax1.set_ylabel('Frequency')
+            ax2.set_ylabel('Frequency')
+            ax1.set_title('Pile up + hard scatter')
+            ax2.set_title('Only hard scatter')
+            ax1.legend()
+            ax2.legend()
 
             # Save figure
             pdf.savefig(fig)
