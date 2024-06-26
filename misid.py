@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+import pandas as pd
 
 
 # Matplotlib settings
@@ -13,6 +14,10 @@ def main():
     # Read the datasets
     dir_path = 'out'
     output_path = dir_path + '/plots'
+
+    #data_path = 'data'
+    #data_train = pd.read_csv(data_path + '/df_train.csv') 
+    #data_test = pd.read_csv(data_path + '/df_test.csv') 
 
     x_test = np.load(dir_path + '/x_test.npy')
     y_test = np.load(dir_path + '/trueClass_test.npy')
