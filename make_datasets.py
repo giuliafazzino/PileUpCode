@@ -19,11 +19,12 @@ plt.rcParams.update(params)
 
 def apply_cuts(df):
     """ Apply some cuts on the variables based on their physical meaning"""
-    df = df.loc[df["clusterE" ] > 0.]
-    df = df[df["cluster_CENTER_LAMBDA"]>0.]
-    df = df[df["cluster_FIRST_ENG_DENS"]>0.]
-    df = df[df["cluster_SECOND_TIME"]>0.]
-    df = df.loc[df['cluster_ENG_CALIB_TOT'] > 0.]
+    df = df.loc[df["cluster_ENG_CALIB_TOT"]>0.3]
+    df = df.loc[df["clusterE"]>0.]
+    df = df.loc[df["cluster_CENTER_LAMBDA"]>0.]
+    df = df.loc[df["cluster_FIRST_ENG_DENS"]>0.]
+    df = df.loc[df["cluster_SECOND_TIME"]>0.]
+    df = df.loc[df["cluster_SIGNIFICANCE"]>0.]
     return df
 
 
@@ -168,7 +169,7 @@ def apply_scale(df, field_name, mode, pre_derived_scale = None):
 def calculate_response(df):
     resp = np.array( df.clusterE.values ) /  np.array( df.cluster_ENG_CALIB_TOT.values )
     df = df.assign(r_e_calculated = resp)
-    #df = df[df['r_e_calculated']>0.1]
+    df = df.loc[df['r_e_calculated']>0.1]
     return df
 
 
@@ -268,7 +269,7 @@ def main():
                'cluster_SECOND_TIME', 
                 # these ones are not used for PU suppression
                'clusterEta', 'cluster_SIGNIFICANCE', 'cluster_PTD', 'nPrimVtx', 
-               'cluster_ENG_CALIB_TOT', 'r_e_calculated']      
+               'cluster_ENG_CALIB_TOT', 'r_e_calculated', 'cluster_LONGITUDINAL' , 'avgMu']      
     
     df = df[columns]
     df_bkg = df_bkg[columns]
@@ -360,7 +361,8 @@ def main():
 
     # Just normalizing
     field_names = ['cluster_EM_PROBABILITY', 'cluster_CENTER_MAG', 'cluster_ENG_FRAC_EM',
-                   'cluster_LATERAL', 'cluster_ISOLATION', 'clusterEta', 'nPrimVtx', 'cluster_PTD']
+                   'cluster_LATERAL', 'cluster_ISOLATION', 'clusterEta', 'nPrimVtx', 'cluster_PTD', 
+                   'avgMu', 'cluster_LONGITUDINAL']
     for field_name in field_names:
         df_train, scales[field_name] = apply_scale(df_train, field_name, 'normalise')
         df_test = apply_scale(df_test, field_name, 'normalise', scales[field_name])[0]
